@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch to Reveal</title>
+
+    <style>
+        body {
+            background-color: #ffdde1;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .floating-emoji {
+            position: absolute;
+            font-size: 50px;
+            animation: floatUp 10s infinite, fadeOut 10s forwards;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh); opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        /* Message box */
+        .message-container {
+            position: relative;
+            width: 80%;
+            max-width: 500px;
+            height: 250px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff477e;
+            overflow: hidden;
+            text-align: center;
+            z-index: 2;
+            cursor: default;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Scratch area */
+        .scratch-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            z-index: 3;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            cursor: grab;
+            z-index: 3;
+            position: absolute;
+            left: 0px;
+        }
+
+        /* Scratch text */
+        .scratch-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 10px;
+            z-index: 4;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="message-container">
+        <div id="secretMessage" style="display: none;">
+            💌 **Dear Prachi,** <br>  
+            You are truly special and loved! 💖 <br>  
+            Wishing you a day filled with happiness, love, and unforgettable memories. 🎂✨  
+            Keep shining always! 🌟  
+        </div>
+
+        <div class="scratch-wrapper">
+            <canvas id="scratchCanvas"></canvas>
+            <div class="scratch-text" id="scratchText">Scratch to Reveal</div>
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" src="https://www.bensound.com/bensound-music/bensound-ukulele.mp3" preload="auto" loop></audio>
+
+    <script>
+        function startEmojiAnimation() {
+            const emojis = ['🎈', '🎂', '🎉', '🎁', '🎊', '❤️'];
+
+            function createEmoji() {
+                const emoji = document.createElement("div");
+                emoji.classList.add("floating-emoji");
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = `${Math.random() * 100}vw`;
+                emoji.style.animationDuration = `${Math.random() * 5 + 10}s`;
+
+                document.body.appendChild(emoji);
+
+                setTimeout(() => emoji.remove(), parseFloat(emoji.style.animationDuration) * 1000);
+            }
+
+            setInterval(createEmoji, 200);
+        }
+
+        function continueMusic() {
+            let music = document.getElementById("backgroundMusic");
+            
+            if (localStorage.getItem("isMusicPlaying") === "true") {
+                music.volume = 0.5;
+                music.play();
+            }
+        }
+
+        // Scratch-to-reveal effect
+        function setupScratchCard() {
+            const canvas = document.getElementById("scratchCanvas");
+            const ctx = canvas.getContext("2d");
+            const scratchText = document.getElementById("scratchText");
+            const messageContainer = document.querySelector(".message-container");
+            const secretMessage = document.getElementById("secretMessage");
+
+            // Ensure the canvas fully covers the message container
+            canvas.width = messageContainer.clientWidth;
+            canvas.height = messageContainer.clientHeight;
+
+            // Draw the hidden message on the canvas
+            ctx.fillStyle = "#ff477e"; // Color of the message text
+            ctx.font = "20px Arial";
+            ctx.fillText("💌 **Dear Prachi,**  You are truly special and loved! 💖", 10, 30);
+            ctx.fillText("Wishing you a day filled with happiness, love, and unforgettable memories. 🎂✨", 10, 60);
+            ctx.fillText("Keep shining always! 🌟", 10, 90);
+
+            // Mask the canvas with transparent black to "hide" the message
+            ctx.fillStyle = "#C0C0C0"; // Scratch layer color (Gray)
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let isScratching = false;
+            let hasScratched = false;
+
+            function scratch(e) {
+                if (!isScratching) return;
+
+                if (!hasScratched) {
+                    hasScratched = true;
+                    scratchText.style.opacity = "0"; // Hide "Scratch to Reveal" text
+                }
+
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+                ctx.globalCompositeOperation = "destination-out"; // Make scratches reveal underlying message
+                ctx.beginPath();
+                ctx.arc(x, y, 25, 0, Math.PI * 2); // Increased radius for smoother scratch
+                ctx.fill();
+            }
+
+            function detectFullScratch() {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                let clearedPixels = 0;
+
+                for (let i = 0; i < imageData.length; i += 4) {
+                    if (imageData[i + 3] === 0) clearedPixels++; // Count transparent pixels
+                }
+
+                let totalPixels = canvas.width * canvas.height;
+                if (clearedPixels > totalPixels * 0.6) {
+                    canvas.style.display = "none"; // Hide scratch layer when enough is revealed
+                    secretMessage.style.display = "block"; // Show the secret message
+                }
+            }
+
+            // Update canvas size on window resize
+            window.addEventListener("resize", function() {
+                canvas.width = messageContainer.clientWidth;
+                canvas.height = messageContainer.clientHeight;
+            });
+
+            canvas.addEventListener("mousedown", () => isScratching = true);
+            canvas.addEventListener("mouseup", () => {
+                isScratching = false;
+                detectFullScratch();
+            });
+            canvas.addEventListener("mousemove", scratch);
+            canvas.addEventListener("touchstart", () => isScratching = true);
+            canvas.addEventListener("touchend", () => {
+                isScratching = false;
+                detectFullScratch();
+            });
+            canvas.addEventListener("touchmove", scratch);
+        }
+
+        startEmojiAnimation();
+        continueMusic();
+        setupScratchCard();
+    </script>
+
+</body>
+</html>

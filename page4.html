@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decorate Page</title>
+
+    <style>
+        body {
+            background-color: #ffdde1;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .floating-emoji {
+            position: absolute;
+            font-size: 50px;
+            animation: floatUp 10s infinite, fadeOut 10s forwards;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh); opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .button {
+            background: #ff6b81;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+            z-index: 2;
+        }
+
+        .button:hover {
+            background: #ff477e;
+        }
+
+        .birthday-banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #ff6b81;
+            color: white;
+            font-size: 30px;
+            padding: 20px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-100%);
+            transition: opacity 2s ease, transform 2s ease;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="button" id="decorateButton" onclick="showBirthdayBanner()">Decorate!!🥳✨</button>
+
+    <div id="birthdayBanner" class="birthday-banner">
+        👀✨🎉 Happyyyy Birthdayyy Prachiiii 🎉✨👀
+    </div>
+
+    <audio id="backgroundMusic" src="https://www.bensound.com/bensound-music/bensound-ukulele.mp3" preload="auto" loop></audio>
+
+    <script>
+        function startEmojiAnimation() {
+            const emojis = ['🎈', '🎂', '🎉', '🎁', '🎊', '❤️'];
+
+            function createEmoji() {
+                const emoji = document.createElement("div");
+                emoji.classList.add("floating-emoji");
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = `${Math.random() * 100}vw`;
+                emoji.style.animationDuration = `${Math.random() * 5 + 10}s`;
+
+                document.body.appendChild(emoji);
+
+                setTimeout(() => emoji.remove(), parseFloat(emoji.style.animationDuration) * 1000);
+            }
+
+            setInterval(createEmoji, 200);
+        }
+
+        function showBirthdayBanner() {
+            document.getElementById("birthdayBanner").style.opacity = "1";
+            document.getElementById("birthdayBanner").style.transform = "translateY(0)";
+
+            startEmojiAnimation();
+
+            document.getElementById("decorateButton").textContent = "Play Music🎶";
+            document.getElementById("decorateButton").onclick = playMusic;
+        }
+
+        function playMusic() {
+            let music = document.getElementById("backgroundMusic");
+            music.volume = 0.5;
+            music.play();
+
+            localStorage.setItem("isMusicPlaying", "true");
+
+            document.getElementById("decorateButton").textContent = "A Secret Message for You🙈";
+            document.getElementById("decorateButton").onclick = goToSecretMessage;
+        }
+
+        function goToSecretMessage() {
+            window.location.href = "page5.html";
+        }
+    </script>
+
+</body>
+</html>

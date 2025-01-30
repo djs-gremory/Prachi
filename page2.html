@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Second Page</title>
+
+    <style>
+        /* Background setup */
+        body {
+            background-color: #ffdde1;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        /* Floating emojis */
+        .floating-emoji {
+            position: absolute;
+            font-size: 50px;
+            animation: floatUp 10s infinite, fadeOut 10s forwards;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh); opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Message box */
+        .message-box {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff477e;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        /* Star emoji */
+        .star {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        /* Button styles */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Space between buttons */
+            margin-top: 20px;
+        }
+
+        .button {
+            background: #ff6b81;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+            width: 180px;
+        }
+
+        .button:hover {
+            background: #ff4757;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Message Box -->
+    <div class="message-box" id="messageBox">
+        <div class="star">👀</div>
+        <p id="messageText">Ek chiz dekhegi Prachi?😉</p>
+        <div class="button-container">
+            <button class="button" onclick="changeMessage()">Nahi, Jao😏</button>
+            <button class="button" onclick="goToNextPage()">Accha thik hai, dikha de😒</button>
+        </div>
+    </div>
+
+    <script>
+        // Floating Emoji Function
+        const emojis = ['🎈', '🎂', '🎉', '🎁', '🎊', '❤️'];
+
+        function createEmoji() {
+            const emoji = document.createElement("div");
+            emoji.classList.add("floating-emoji");
+            emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            emoji.style.left = `${Math.random() * 100}vw`;
+            emoji.style.animationDuration = `${Math.random() * 5 + 10}s`;
+
+            document.body.appendChild(emoji);
+
+            setTimeout(() => emoji.remove(), parseFloat(emoji.style.animationDuration) * 1000);
+        }
+
+        setInterval(createEmoji, 200);
+
+        // Message change function for "Nahi, Jao" button
+        const messages = [
+            "Please dekh le!😩",
+            "Ek baar dekh le bs🥺",
+            "Dekh na accha hai😫",
+            "Are sacchi accha hai dekh to😔",
+            "Sochle ek baar!!😏",
+            "Phir nahi puchenge😤",
+            "Dekh lo na😕",
+            "Please na dekh lo☹️",
+            "Tu chahti kya hai?🫠",
+            "Bs ho gaya Prachi dekh lo ab🥲",
+            "Ek baar dekh le yaar😉"
+        ];
+
+        function changeMessage() {
+            const messageBox = document.getElementById("messageText");
+            const randomIndex = Math.floor(Math.random() * messages.length);
+            messageBox.textContent = messages[randomIndex];
+        }
+
+        // Function to go to the next page
+        function goToNextPage() {
+            window.location.href = "page3.html"; // Change this to your actual next page URL
+        }
+    </script>
+
+</body>
+</html>
